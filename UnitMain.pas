@@ -5,10 +5,10 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects,
-  FMX.Ani, FMX.Effects, FMX.Filter.Effects;
+  FMX.Ani, FMX.Effects, FMX.Filter.Effects, System.UIConsts;
 
 type
-  TAniPoint = record
+  TAnimatedPoint = record
     Position: TPointF;
     Angle: Single;
     constructor Create(X, Y, Angle: Single);
@@ -21,7 +21,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure TimerAnimateTimer(Sender: TObject);
   private
-    AniPoints: TArray<TAniPoint>;
+    Points: TArray<TAnimatedPoint>;
     Bitmap: TBitmap;
     procedure Update();
   end;
@@ -31,9 +31,9 @@ const
   AnimationSpeed = 2.0;
   BorderWidth = 10.0;
   IterationCount = 4;
-  DarkValue = 5;
+  DarkValue = 4;
   PathOpacity = 0.6;
-  PathColor = TAlphaColorRec.Lightcyan;//TAlphaColorRec.Bisque;
+  //PathColor = TAlphaColorRec.Lightcyan;//TAlphaColorRec.Bisque;
 
 var
   FormMain: TFormMain;
@@ -118,11 +118,13 @@ var
 begin
   Bitmap := TBitmap.Create(800, 600);
 
-  AniPoints := [];
+  Points := [];
   for I := 0 to PointCount - 1 do
-  AniPoints := AniPoints + [
-    TAniPoint.Create(Bitmap.Width * Random(), Bitmap.Height * Random(), 2 * Pi * Random())
-  ];
+  begin
+    Points := Points + [
+      TAnimatedPoint.Create(Bitmap.Width * Random(), Bitmap.Height * Random(), 2 * Pi * Random())
+    ];
+  end;
 end;
 
 procedure TFormMain.Update();
@@ -134,35 +136,35 @@ begin
   // *** update ***
 
   // animate points
-  for I := 0 to High(AniPoints) do
+  for I := 0 to High(Points) do
   begin
-    AniPoints[I].Position.X := AniPoints[I].Position.X + Cos(AniPoints[I].Angle) * AnimationSpeed;
-    AniPoints[I].Position.Y := AniPoints[I].Position.Y + Sin(AniPoints[I].Angle) * AnimationSpeed;
+    Points[I].Position.X := Points[I].Position.X + Cos(Points[I].Angle) * AnimationSpeed;
+    Points[I].Position.Y := Points[I].Position.Y + Sin(Points[I].Angle) * AnimationSpeed;
   end;
 
   // fix out of bounds
-  for I := 0 to High(AniPoints) do
+  for I := 0 to High(Points) do
   begin
     // left
-    if AniPoints[I].Position.X < BorderWidth then
-      AniPoints[I].Angle := -Pi / 2 + Random * Pi;
+    if Points[I].Position.X < BorderWidth then
+      Points[I].Angle := -Pi / 2 + Random * Pi;
     // right
-    if AniPoints[I].Position.X > Bitmap.Width - BorderWidth then
-      AniPoints[I].Angle := Pi / 2 + Random * Pi;
+    if Points[I].Position.X > Bitmap.Width - BorderWidth then
+      Points[I].Angle := Pi / 2 + Random * Pi;
     // top
-    if AniPoints[I].Position.Y < BorderWidth then
-      AniPoints[I].Angle := Random * Pi;
+    if Points[I].Position.Y < BorderWidth then
+      Points[I].Angle := Random * Pi;
     // bottom
-    if AniPoints[I].Position.Y > Bitmap.Height - BorderWidth then
-      AniPoints[I].Angle := Pi + Random * Pi;
+    if Points[I].Position.Y > Bitmap.Height - BorderWidth then
+      Points[I].Angle := Pi + Random * Pi;
   end;
 
   // *** make path from point ***
 
   // copy points
   PathPoints := [];
-  for I := 0 to High(AniPoints) do
-    PathPoints := PathPoints + [AniPoints[I].Position];
+  for I := 0 to High(Points) do
+    PathPoints := PathPoints + [Points[I].Position];
 
   // make path
   for I := 0 to IterationCount - 1 do
@@ -187,7 +189,7 @@ begin
 
       // draw
       Bitmap.Canvas.Stroke.Kind := TBrushKind.Solid;
-      Bitmap.Canvas.Stroke.Color := PathColor;
+      Bitmap.Canvas.Stroke.Color := HSLtoRGB((TThread.GetTickCount64() div 30 mod 360) / 360, 1.0, 0.8);// PathColor;
       Bitmap.Canvas.Stroke.Join := TStrokeJoin.Round;
       Bitmap.Canvas.Stroke.Thickness := 7;
       Bitmap.Canvas.DrawPath(Path, PathOpacity);
@@ -213,7 +215,7 @@ end;
 
 { TAniPoint }
 
-constructor TAniPoint.Create(X, Y, Angle: Single);
+constructor TAnimatedPoint.Create(X, Y, Angle: Single);
 begin
   Self.Position.X := X;
   Self.Position.Y := Y;
