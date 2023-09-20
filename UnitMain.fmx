@@ -1,0 +1,28 @@
+object FormMain: TFormMain
+  Left = 0
+  Top = 0
+  BorderStyle = Single
+  Caption = 'ChaikinSmoothEffect'
+  ClientHeight = 618
+  ClientWidth = 817
+  Fill.Color = claBlack
+  Fill.Kind = Solid
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object PaintBox: TPaintBox
+    Align = Center
+    Size.Width = 800.000000000000000000
+    Size.Height = 600.000000000000000000
+    Size.PlatformDefault = False
+    OnPaint = PaintBoxPaint
+  end
+  object TimerAnimate: TTimer
+    Interval = 30
+    OnTimer = TimerAnimateTimer
+    Left = 304
+    Top = 224
+  end
+end
