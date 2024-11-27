@@ -1,6 +1,8 @@
 # ChaikinSmoothEffect
 ChaikinSmoothEffect (Delphi + FMX)
 
+[Powered By Delphi (ObjectPascal)](https://www.embarcadero.com/)
+
 ![scr](scr.gif)
 
 Челенж для малюток - переписать этот эффект на ваш любимый ЯП + Фреймворк.  
